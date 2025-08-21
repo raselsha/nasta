@@ -16,12 +16,12 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
         .container {
             max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: #fff;
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -67,23 +67,24 @@
             justify-content: space-between;
             padding:5px;
             margin-bottom:5px;
-            background: #caf7ff;
-            border-radius: 12px;
-            border: 2px solid transparent;
+            background: #e9ecef;
+            border-radius: 5px;
+            border: 1px solid transparent;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .menu-item:hover {
-            background: #e9ecef;
+        .menu-item:hover,.menu-item.selected {
+            background: #ff6b6b49;
             border-color: #ff6b6b;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.15);
+            box-shadow: 0 0px 5px rgba(255, 107, 107, 0.15);
         }
 
         .item-left {
             display: flex;
             align-items: center;
-            flex: 1;
+            width: 240px;
         }
 
         .menu-item input[type="checkbox"] {
@@ -189,15 +190,16 @@
             background: #f8f9fa;
             border-radius: 12px;
             padding: 20px;
-            margin: 20px 0;
             border: 1px solid #ff6b6b;
+            height: 100%;
         }
 
         .summary-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 5px 0;
+            margin: 2px 0;
+            padding: 2px 0;
+            border-bottom: 1px dotted #666;
         }
 
         .submit-btn {
@@ -231,6 +233,21 @@
             border-radius: 8px;
             border: 2px dashed #ff6b6b;
         }
+        .mini-cart{
+            position: fixed;
+            right: 0;
+            top:50%;
+            transform: translateY(-50%);
+            height: 100%;
+        }
+        .summaryItems{
+            min-height:650px;
+            overflow: auto;
+        }
+        .menuItems{
+            height: 800px;
+            overflow: auto;
+        }
     </style>
 </head>
 <body>
@@ -238,15 +255,60 @@
         <form class="form-content" id="breakfastForm">
             <div class="menu-section">
                 <h3 class="section-title">Breakfast Menu</h3>
-                <div id="menuItems"></div>
-            </div>
-            <div class="order-summary" id="orderSummary" style="display: none;">
-                <h3 class="section-title">Order Summary</h3>
-                <div id="summaryItems"></div>
-                <div class="total-amount" id="totalAmount">Total Items: 0</div>
-                <button type="submit" class="submit-btn">Place Order</button>
+                <div id="menuItems" class="menuItems"></div>
             </div>
         </form>
+    </div>
+    <div class="mini-cart">
+        <div class="order-summary" id="orderSummary" style="display: none;">
+            <h3 class="section-title">Order Summary</h3>
+            <div id="summaryItems" class="summaryItems"></div>
+            <div class="total-amount" id="totalAmount">Total Items: 0</div>
+            <!-- <button type="submit" class="submit-btn">Place Order</button> -->
+            <button type="submit" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+        <script>
+     function downloadSummaryImage() {
+        const orderSummary = document.getElementById('summaryItems');
+
+        // Save old styles
+        const prevOverflow = orderSummary.style.overflow;
+        const prevHeight   = orderSummary.style.height;
+
+        // Expand container so all content is visible
+        orderSummary.style.overflow = "visible";
+        orderSummary.style.height   = "auto";
+
+        html2canvas(orderSummary, {
+            backgroundColor: '#fff',
+            useCORS: true,
+            width: orderSummary.scrollWidth,   // 👈 add some margin room
+            height: orderSummary.scrollHeight + 40, // 👈 add some margin room
+            windowWidth: orderSummary.scrollWidth + 40,
+            windowHeight: orderSummary.scrollHeight + 40,
+            onclone: (clonedDoc) => {
+                const clonedSummary = clonedDoc.getElementById('summaryItems');
+                if (clonedSummary) {
+                    clonedSummary.style.padding = "20px"; // 👈 top/right/bottom/left
+                    clonedSummary.style.boxSizing = "border-box";
+                }
+            }
+        }).then(canvas => {
+            // Restore old styles
+            orderSummary.style.overflow = prevOverflow;
+            orderSummary.style.height   = prevHeight;
+
+            // Trigger download
+            const link = document.createElement('a');
+            link.download = 'order-summary.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
+
+        </script>
     </div>
     <script>
         // Define menu items in Bangla with price
@@ -272,6 +334,22 @@
             { id: 19, name: 'সিঙ্গারা', price: 20 },
             { id: 20, name: 'সমুচা', price: 20 }
         ];
+        function toggleCheckbox(id) {
+    const checkbox = document.getElementById(`item${id}`);
+    
+    // toggle checkbox
+    checkbox.checked = !checkbox.checked;  
+    
+    // trigger onchange
+    checkbox.dispatchEvent(new Event('change')); 
+    
+    // add/remove selected class on parent div
+    if (checkbox.checked) {
+        checkbox.closest('.menu-item').classList.add("selected");
+    } else {
+        checkbox.closest('.menu-item').classList.remove("selected");
+    }
+}
 
         // Render menu items dynamically
         function renderMenu() {
@@ -280,10 +358,11 @@
             menuItemsData.forEach(item => {
                 menuDiv.innerHTML += `
                 <div class="menu-item">
-                    <div class="item-left">
+                    <div class="item-left" onclick="toggleCheckbox(${item.id})">
                         <input type="checkbox" id="item${item.id}" onchange="toggleQuantity(${item.id})">
-                        <label for="item${item.id}" class="item-name">${item.name} <span style="color:#ff6b6b;font-size:0.95em;">৳${item.price}</span></label>
+                        <label for="item${item.id}" class="item-name">${item.name} </label>
                     </div>
+                    <h2 style="color:#ff6b6b;font-size:0.95em;">৳${item.price}</h2>
                     <div class="quantity-input" id="qty${item.id}">
                         <button type="button" class="qty-btn" onclick="decreaseQty(${item.id})">−</button>
                         <input type="number" id="input${item.id}" value="1" min="1" max="50" readonly>
