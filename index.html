@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakfast Order Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ff6b6b;
+            padding-bottom: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding:5px;
+            margin-bottom:5px;
+            background: #caf7ff;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background: #e9ecef;
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.15);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .menu-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #ff6b6b;
+        }
+
+        .item-name {
+            font-size: 1.1rem;
+            color: #333;
+            text-transform: capitalize;
+            font-weight: 500;
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .quantity-input.active {
+            opacity: 1;
+        }
+
+        .quantity-input input {
+            width: 60px;
+            height: 40px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 0 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        .quantity-input input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: #ee5a24;
+            transform: scale(1.1);
+        }
+
+        .qty-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .customer-info {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .total-amount {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form class="form-content" id="breakfastForm">
+            <div class="menu-section">
+                <h3 class="section-title">Breakfast Menu</h3>
+                
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item1" onchange="toggleQuantity(1)">
+                        <label for="item1" class="item-name">Porota</label>
+                    </div>
+                    <div class="quantity-input" id="qty1">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(1)">−</button>
+                        <input type="number" id="input1" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item2" onchange="toggleQuantity(2)">
+                        <label for="item2" class="item-name">Porota Tel Sara</label>
+                    </div>
+                    <div class="quantity-input" id="qty2">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(2)">−</button>
+                        <input type="number" id="input2" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(2)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item3" onchange="toggleQuantity(3)">
+                        <label for="item3" class="item-name">Dim Pos</label>
+                    </div>
+                    <div class="quantity-input" id="qty3">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(3)">−</button>
+                        <input type="number" id="input3" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(3)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item4" onchange="toggleQuantity(4)">
+                        <label for="item4" class="item-name">Dim Vaji</label>
+                    </div>
+                    <div class="quantity-input" id="qty4">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(4)">−</button>
+                        <input type="number" id="input4" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(4)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item5" onchange="toggleQuantity(5)">
+                        <label for="item5" class="item-name">Khichuri</label>
+                    </div>
+                    <div class="quantity-input" id="qty5">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(5)">−</button>
+                        <input type="number" id="input5" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(5)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item6" onchange="toggleQuantity(6)">
+                        <label for="item6" class="item-name">Dim Khichuri</label>
+                    </div>
+                    <div class="quantity-input" id="qty6">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(6)">−</button>
+                        <input type="number" id="input6" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(6)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item7" onchange="toggleQuantity(7)">
+                        <label for="item7" class="item-name">Rumali Ruti</label>
+                    </div>
+                    <div class="quantity-input" id="qty7">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(7)">−</button>
+                        <input type="number" id="input7" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(7)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item8" onchange="toggleQuantity(8)">
+                        <label for="item8" class="item-name">Tanduri Ruti</label>
+                    </div>
+                    <div class="quantity-input" id="qty8">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(8)">−</button>
+                        <input type="number" id="input8" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(8)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item9" onchange="toggleQuantity(9)">
+                        <label for="item9" class="item-name">Sup</label>
+                    </div>
+                    <div class="quantity-input" id="qty9">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(9)">−</button>
+                        <input type="number" id="input9" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(9)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item10" onchange="toggleQuantity(10)">
+                        <label for="item10" class="item-name">Nehari</label>
+                    </div>
+                    <div class="quantity-input" id="qty10">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(10)">−</button>
+                        <input type="number" id="input10" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(10)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item11" onchange="toggleQuantity(11)">
+                        <label for="item11" class="item-name">Sobji</label>
+                    </div>
+                    <div class="quantity-input" id="qty11">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(11)">−</button>
+                        <input type="number" id="input11" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(11)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item12" onchange="toggleQuantity(12)">
+                        <label for="item12" class="item-name">Dal</label>
+                    </div>
+                    <div class="quantity-input" id="qty12">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(12)">−</button>
+                        <input type="number" id="input12" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(12)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item13" onchange="toggleQuantity(13)">
+                        <label for="item13" class="item-name">Dal Shobji</label>
+                    </div>
+                    <div class="quantity-input" id="qty13">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(13)">−</button>
+                        <input type="number" id="input13" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(13)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item14" onchange="toggleQuantity(14)">
+                        <label for="item14" class="item-name">Doi</label>
+                    </div>
+                    <div class="quantity-input" id="qty14">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(14)">−</button>
+                        <input type="number" id="input14" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(14)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item15" onchange="toggleQuantity(15)">
+                        <label for="item15" class="item-name">Misti</label>
+                    </div>
+                    <div class="quantity-input" id="qty15">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(15)">−</button>
+                        <input type="number" id="input15" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(15)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item16" onchange="toggleQuantity(16)">
+                        <label for="item16" class="item-name">Kola</label>
+                    </div>
+                    <div class="quantity-input" id="qty16">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(16)">−</button>
+                        <input type="number" id="input16" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(16)">+</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-left">
+                        <input type="checkbox" id="item17" onchange="toggleQuantity(17)">
+                        <label for="item17" class="item-name">Mug Dal</label>
+                    </div>
+                    <div class="quantity-input" id="qty17">
+                        <button type="button" class="qty-btn" onclick="decreaseQty(17)">−</button>
+                        <input type="number" id="input17" value="1" min="1" max="50" readonly>
+                        <button type="button" class="qty-btn" onclick="increaseQty(17)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-summary" id="orderSummary" style="display: none;">
+                <h3 class="section-title">Order Summary</h3>
+                <div id="summaryItems"></div>
+                <div class="total-amount" id="totalAmount">Total Items: 0</div>
+            </div>
+
+            <button type="submit" class="submit-btn">Place Order</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleQuantity(itemId) {
+            const checkbox = document.getElementById(`item${itemId}`);
+            const qtyDiv = document.getElementById(`qty${itemId}`);
+            
+            if (checkbox.checked) {
+                qtyDiv.classList.add('active');
+            } else {
+                qtyDiv.classList.remove('active');
+            }
+            updateOrderSummary();
+        }
+
+        function increaseQty(itemId) {
+            const input = document.getElementById(`input${itemId}`);
+            const currentValue = parseInt(input.value);
+            if (currentValue < 50) {
+                input.value = currentValue + 1;
+                updateOrderSummary();
+            }
+        }
+
+        function decreaseQty(itemId) {
+            const input = document.getElementById(`input${itemId}`);
+            const currentValue = parseInt(input.value);
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+                updateOrderSummary();
+            }
+        }
+
+        function updateOrderSummary() {
+            const menuItems = [
+                    'পরোটা', 
+                    'পরোটা তেল সারা', 
+                    'ডিম পোচ', 
+                    'ডিম ভাজি', 
+                    'খিচুড়ি',
+                    'ডিম খিচুড়ি', 
+                    'রুমালি রুটি', 
+                    'তন্দুরি রুটি', 
+                    'স্যুপ', 
+                    'নেহারি',
+                    'সবজি', 
+                    'দাল', 
+                    'দাল সবজি', 
+                    'দই', 
+                    'মিষ্টি', 
+                    'কলা', 
+                    'মুগ ডাল'
+                    ];
+
+            const summaryDiv = document.getElementById('summaryItems');
+            const orderSummaryDiv = document.getElementById('orderSummary');
+            const totalAmountDiv = document.getElementById('totalAmount');
+            
+            let summaryHtml = '';
+            let totalItems = 0;
+            let hasSelectedItems = false;
+
+            for (let i = 1; i <= 17; i++) {
+                const checkbox = document.getElementById(`item${i}`);
+                const qtyInput = document.getElementById(`input${i}`);
+                
+                if (checkbox.checked) {
+                    hasSelectedItems = true;
+                    const quantity = parseInt(qtyInput.value);
+                    totalItems += quantity;
+                    summaryHtml += `
+                        <div class="summary-item">
+                            <span>${menuItems[i-1]}</span>
+                            <span>× ${quantity}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            if (hasSelectedItems) {
+                orderSummaryDiv.style.display = 'block';
+                summaryDiv.innerHTML = summaryHtml;
+                totalAmountDiv.textContent = `Total Items: ${totalItems}`;
+            } else {
+                orderSummaryDiv.style.display = 'none';
+            }
+        }
+
+        document.getElementById('breakfastForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            
+            if (!customerName || !customerPhone) {
+                alert('Please fill in name and phone number.');
+                return;
+            }
+
+            const selectedItems = [];
+            const menuItems = [
+                'Porota', 'Porota Tel Sara', 'Dim Pos', 'Dim Vaji', 'Khichuri', 
+                'Dim Khichuri', 'Rumali Ruti', 'Tanduri Ruti', 'Sup', 'Nehari', 
+                'Sobji', 'Dal', 'Dal Shobji', 'Doi', 'Misti', 'Kola'
+            ];
+
+            for (let i = 1; i <= 16; i++) {
+                const checkbox = document.getElementById(`item${i}`);
+                const qtyInput = document.getElementById(`input${i}`);
+                
+                if (checkbox.checked) {
+                    selectedItems.push({
+                        item: menuItems[i-1],
+                        quantity: parseInt(qtyInput.value)
+                    });
+                }
+            }
+
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item.');
+                return;
+            }
+
+            // Create order summary
+            let orderText = `🍳 BREAKFAST ORDER\n\n`;
+            orderText += `👤 Customer: ${customerName}\n`;
+            orderText += `📞 Phone: ${customerPhone}\n`;
+            if (customerAddress) {
+                orderText += `📍 Address: ${customerAddress}\n`;
+            }
+            orderText += `\n📋 ORDER DETAILS:\n`;
+            orderText += `${'='.repeat(30)}\n`;
+            
+            let totalItems = 0;
+            selectedItems.forEach(item => {
+                orderText += `• ${item.item} × ${item.quantity}\n`;
+                totalItems += item.quantity;
+            });
+            
+            orderText += `${'='.repeat(30)}\n`;
+            orderText += `📊 Total Items: ${totalItems}\n`;
+            orderText += `📅 Order Time: ${new Date().toLocaleString()}\n`;
+
+            // Display order summary in alert
+            alert(orderText);
+            
+            // You can also log to console or send to server
+            console.log('Order submitted:', {
+                customer: { name: customerName, phone: customerPhone, address: customerAddress },
+                items: selectedItems,
+                totalItems: totalItems,
+                orderTime: new Date()
+            });
+        });
+    </script>
+</body>
+</html>
