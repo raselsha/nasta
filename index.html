@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Breakfast Order Form</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        
+    </style>
 </head>
 <body>
     <div class="container">
+        
         <form class="form-content" id="breakfastForm">
             <div class="menu-section">
                 <h3 class="section-title">Breakfast Menu</h3>
+                <div class="user-list">
+                    <span class="user-label">Select User:</span>
+                    <select id="userSelect"></select>
+                    <span id="userBalance" class="user-balance"></span>
+                </div>
                 <div id="menuItems" class="menuItems"></div>
             </div>
         </form>
@@ -20,54 +29,94 @@
             <h3 class="section-title">Order Summary</h3>
             <div id="summaryItems" class="summaryItems"></div>
             <div class="total-amount" id="totalAmount">Total Items: 0</div>
-            <!-- <button type="submit" class="submit-btn">Place Order</button> -->
-            <button type="submit" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button>
+            <button type="button" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-        <script>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
      function downloadSummaryImage() {
         const orderSummary = document.getElementById('summaryItems');
-
-        // Save old styles
         const prevOverflow = orderSummary.style.overflow;
         const prevHeight   = orderSummary.style.height;
-
-        // Expand container so all content is visible
         orderSummary.style.overflow = "visible";
         orderSummary.style.height   = "auto";
-
         html2canvas(orderSummary, {
             backgroundColor: '#fff',
             useCORS: true,
-            width: orderSummary.scrollWidth,   // 👈 add some margin room
-            height: orderSummary.scrollHeight + 40, // 👈 add some margin room
+            width: orderSummary.scrollWidth,
+            height: orderSummary.scrollHeight + 40,
             windowWidth: orderSummary.scrollWidth + 40,
             windowHeight: orderSummary.scrollHeight + 40,
             onclone: (clonedDoc) => {
                 const clonedSummary = clonedDoc.getElementById('summaryItems');
                 if (clonedSummary) {
-                    clonedSummary.style.padding = "20px"; // 👈 top/right/bottom/left
+                    clonedSummary.style.padding = "20px";
                     clonedSummary.style.boxSizing = "border-box";
                 }
             }
         }).then(canvas => {
-            // Restore old styles
             orderSummary.style.overflow = prevOverflow;
             orderSummary.style.height   = prevHeight;
-
-            // Trigger download
             const link = document.createElement('a');
             link.download = 'order-summary.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
     }
-
-
-        </script>
-    </div>
+    </script>
     <script>
-        // Define menu items in Bangla with price
+        // --- User Management ---
+        let users = ['Boss','Mahin',"Sumon","Azad","Shahadat","Asif","Suvo","Rabiul","Shahnur"];
+        let userBalances = {
+            'Boss': 0,
+            'Mahin': 0,
+            'Sumon': 0,
+            'Azad': 0,
+            'Shahadat': 0,
+            'Asif': 0,
+            'Suvo': 0,
+            'Rabiul': 0,
+            'Shahnur': 0
+        };
+        let currentUser = users[0];
+        let userOrders = {}; // { username: {itemId: quantity, ...}, ... }
+
+        function renderUserSelect() {
+            const userSelect = document.getElementById('userSelect');
+            userSelect.innerHTML = '';
+            users.forEach(user => {
+                const opt = document.createElement('option');
+                opt.value = user;
+                opt.textContent = user;
+                userSelect.appendChild(opt);
+            });
+            userSelect.value = currentUser;
+            updateUserBalance();
+        }
+
+        function updateUserBalance() {
+            const balanceSpan = document.getElementById('userBalance');
+            let order = userOrders[currentUser] || {};
+            let total = 0;
+            Object.keys(order).forEach(itemId => {
+                const item = menuItemsData.find(i => i.id == itemId);
+                if (item) total += order[itemId] * item.price;
+            });
+            let balance = userBalances[currentUser] - total;
+            balanceSpan.textContent = `Balance: ৳${balance}`;
+            balanceSpan.className = 'user-balance' + (balance < 0 ? ' balance-negative' : '');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserSelect();
+            document.getElementById('userSelect').addEventListener('change', function() {
+                currentUser = this.value;
+                loadUserOrder();
+                updateUserBalance();
+            });
+        });
+
+        // --- Menu and Order Logic ---
         const menuItemsData = [
             { id: 1, name: 'পরোটা', price: 20 },
             { id: 2, name: 'পরোটা তেল ছাড়া', price: 20 },
@@ -90,24 +139,18 @@
             { id: 19, name: 'সিঙ্গারা', price: 20 },
             { id: 20, name: 'সমুচা', price: 20 }
         ];
-        function toggleCheckbox(id) {
-    const checkbox = document.getElementById(`item${id}`);
-    
-    // toggle checkbox
-    checkbox.checked = !checkbox.checked;  
-    
-    // trigger onchange
-    checkbox.dispatchEvent(new Event('change')); 
-    
-    // add/remove selected class on parent div
-    if (checkbox.checked) {
-        checkbox.closest('.menu-item').classList.add("selected");
-    } else {
-        checkbox.closest('.menu-item').classList.remove("selected");
-    }
-}
 
-        // Render menu items dynamically
+        function toggleCheckbox(id) {
+            const checkbox = document.getElementById(`item${id}`);
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+            if (checkbox.checked) {
+                checkbox.closest('.menu-item').classList.add("selected");
+            } else {
+                checkbox.closest('.menu-item').classList.remove("selected");
+            }
+        }
+
         function renderMenu() {
             const menuDiv = document.getElementById('menuItems');
             menuDiv.innerHTML = '';
@@ -134,10 +177,13 @@
             const qtyDiv = document.getElementById(`qty${itemId}`);
             if (checkbox.checked) {
                 qtyDiv.classList.add('active');
+                saveUserOrder(itemId, parseInt(document.getElementById(`input${itemId}`).value));
             } else {
                 qtyDiv.classList.remove('active');
+                saveUserOrder(itemId, 0);
             }
             updateOrderSummary();
+            updateUserBalance();
         }
 
         function increaseQty(itemId) {
@@ -145,7 +191,9 @@
             const currentValue = parseInt(input.value);
             if (currentValue < 50) {
                 input.value = currentValue + 1;
+                saveUserOrder(itemId, currentValue + 1);
                 updateOrderSummary();
+                updateUserBalance();
             }
         }
 
@@ -154,8 +202,40 @@
             const currentValue = parseInt(input.value);
             if (currentValue > 1) {
                 input.value = currentValue - 1;
+                saveUserOrder(itemId, currentValue - 1);
                 updateOrderSummary();
+                updateUserBalance();
             }
+        }
+
+        function saveUserOrder(itemId, qty) {
+            if (!userOrders[currentUser]) userOrders[currentUser] = {};
+            if (qty > 0) {
+                userOrders[currentUser][itemId] = qty;
+            } else {
+                delete userOrders[currentUser][itemId];
+            }
+        }
+
+        function loadUserOrder() {
+            // Uncheck all
+            menuItemsData.forEach(item => {
+                document.getElementById(`item${item.id}`).checked = false;
+                document.getElementById(`qty${item.id}`).classList.remove('active');
+                document.getElementById(`input${item.id}`).value = 1;
+                document.getElementById(`item${item.id}`).closest('.menu-item').classList.remove("selected");
+            });
+            // Load for current user
+            const order = userOrders[currentUser] || {};
+            Object.keys(order).forEach(itemId => {
+                const id = parseInt(itemId);
+                document.getElementById(`item${id}`).checked = true;
+                document.getElementById(`qty${id}`).classList.add('active');
+                document.getElementById(`input${id}`).value = order[itemId];
+                document.getElementById(`item${id}`).closest('.menu-item').classList.add("selected");
+            });
+            updateOrderSummary();
+            updateUserBalance();
         }
 
         function updateOrderSummary() {
@@ -167,20 +247,30 @@
             let totalPrice = 0;
             let hasSelectedItems = false;
 
-            menuItemsData.forEach(item => {
-                const checkbox = document.getElementById(`item${item.id}`);
-                const qtyInput = document.getElementById(`input${item.id}`);
-                if (checkbox && checkbox.checked) {
+            users.forEach(user => {
+                const order = userOrders[user] || {};
+                const items = Object.keys(order);
+                if (items.length > 0) {
                     hasSelectedItems = true;
-                    const quantity = parseInt(qtyInput.value);
-                    totalItems += quantity;
-                    totalPrice += quantity * item.price;
-                    summaryHtml += `
-                        <div class="summary-item">
-                            <span>${item.name}</span>
-                            <span>× ${quantity} = ৳${quantity * item.price}</span>
-                        </div>
-                    `;
+                    summaryHtml += `<div class="summary-user">${user}:</div>`;
+                    items.forEach(itemId => {
+                        const item = menuItemsData.find(i => i.id == itemId);
+                        const quantity = order[itemId];
+                        totalItems += quantity;
+                        totalPrice += quantity * item.price;
+                        summaryHtml += `
+                            <div class="summary-item">
+                                <span>${item.name}</span>
+                                <span>× ${quantity} = ৳${quantity * item.price}</span>
+                            </div>
+                        `;
+                    });
+                    // Show balance after order for each user
+                    let userBalance = userBalances[user] - items.reduce((sum, itemId) => {
+                        const item = menuItemsData.find(i => i.id == itemId);
+                        return sum + (order[itemId] * item.price);
+                    }, 0);
+                    summaryHtml += `<div class="user-balance${userBalance < 0 ? ' balance-negative' : ''}">Balance: ৳${userBalance}</div>`;
                 }
             });
 
@@ -198,6 +288,8 @@
         window.decreaseQty = decreaseQty;
 
         renderMenu();
+        // Initialize userOrders for all users
+        users.forEach(u => userOrders[u] = {});
 
         document.getElementById('menuItems').addEventListener('change', updateOrderSummary);
 
@@ -206,6 +298,9 @@
             updateOrderSummary();
             alert('Order placed! (Implement your own logic here)');
         });
+
+        // Load first user's order on page load
+        loadUserOrder();
     </script>
 </body>
 </html>

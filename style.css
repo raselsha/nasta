@@ -241,3 +241,14 @@
             height: 800px;
             overflow: auto;
         }
+
+        /* userlist */
+        .user-list { margin: 1em 0;  display: flex;align-items: center;justify-content:center;}
+        .user-list select, .user-list input { margin-right: 0.5em;
+            padding:5px 10px;
+            width: 260px; }
+        .user-list .user-btn { margin-left: 0.5em; }
+        .user-label { font-weight: bold; margin-right: 0.5em; }
+        .summary-user { margin: 1px 0; font-size:15px; font-weight: bold;}
+        .user-balance { margin: 2px 0; color: #007b5e; font-size: 14px; }
+        .balance-negative { color: #ff6b6b; }
