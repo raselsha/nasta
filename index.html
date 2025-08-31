@@ -76,10 +76,30 @@
         });
     }
     function downloadFullSummaryImage() {
-        const fullSummary = document.getElementById('fullSummaryItems');
-        html2canvas(fullSummary, { backgroundColor: '#fff' }).then(canvas => {
+        const orderSummary = document.getElementById('fullSummaryItems');
+        const prevOverflow = orderSummary.style.overflow;
+        const prevHeight   = orderSummary.style.height;
+        orderSummary.style.overflow = "visible";
+        orderSummary.style.height   = "auto";
+        html2canvas(orderSummary, {
+            backgroundColor: '#fff',
+            useCORS: true,
+            width: orderSummary.scrollWidth,
+            height: orderSummary.scrollHeight + 40,
+            windowWidth: orderSummary.scrollWidth + 40,
+            windowHeight: orderSummary.scrollHeight + 40,
+            onclone: (clonedDoc) => {
+                const clonedSummary = clonedDoc.getElementById('fullSummaryItems');
+                if (clonedSummary) {
+                    clonedSummary.style.padding = "20px";
+                    clonedSummary.style.boxSizing = "border-box";
+                }
+            }
+        }).then(canvas => {
+            orderSummary.style.overflow = prevOverflow;
+            orderSummary.style.height   = prevHeight;
             const link = document.createElement('a');
-            link.download = 'all-orders-summary.png';
+            link.download = 'order-summary.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
@@ -90,15 +110,15 @@
         // --- User Management ---
         let users = ['Boss','Mahin',"Sumon","Azad","Shahadat","Asif","Suvo","Rabiul","Shahnur"];
         let userBalances = {
-            'Boss': 0,
-            'Mahin': 0,
-            'Sumon': 0,
-            'Azad': 0,
-            'Shahadat': 0,
-            'Asif': 0,
-            'Suvo': 0,
-            'Rabiul': 0,
-            'Shahnur': 0
+            'Boss': 30,
+            'Mahin': 30,
+            'Sumon': 30,
+            'Azad': 30,
+            'Shahadat': 30,
+            'Asif': 30,
+            'Suvo': 30,
+            'Rabiul': 30,
+            'Shahnur': 30
         };
         let currentUser = users[0];
         let userOrders = {}; // { username: {itemId: quantity, ...}, ... }
@@ -274,7 +294,14 @@
                 const items = Object.keys(order);
                 if (items.length > 0) {
                     hasSelectedItems = true;
-                    summaryHtml += `<div class="summary-user">${user}:</div>`;
+                    
+                     // Show balance after order for each user
+                    let userBalance = userBalances[user] - items.reduce((sum, itemId) => {
+                        const item = menuItemsData.find(i => i.id == itemId);
+                        return sum + (order[itemId] * item.price);
+                    }, 0);
+                    summaryHtml += `<div class="summary-user">${user}:<span class="user-balance${userBalance < 0 ? ' balance-negative' : ''}"> ৳${userBalance}</span></div>`;
+                    
                     items.forEach(itemId => {
                         const item = menuItemsData.find(i => i.id == itemId);
                         const quantity = order[itemId];
@@ -287,12 +314,7 @@
                             </div>
                         `;
                     });
-                    // Show balance after order for each user
-                    let userBalance = userBalances[user] - items.reduce((sum, itemId) => {
-                        const item = menuItemsData.find(i => i.id == itemId);
-                        return sum + (order[itemId] * item.price);
-                    }, 0);
-                    summaryHtml += `<div class="user-balance${userBalance < 0 ? ' balance-negative' : ''}">Balance: ৳${userBalance}</div>`;
+                   
                 }
             });
             const miniCart = document.querySelector('.mini-cart');
@@ -344,13 +366,14 @@
 
             let consolidatedOrders = {}; // { itemId: totalQty }
             let totalPrice = 0;
-
+            let totalItems = 0;
             // Collect all orders across all users
             users.forEach(user => {
                 const order = userOrders[user] || {};
                 Object.keys(order).forEach(itemId => {
                     if (!consolidatedOrders[itemId]) consolidatedOrders[itemId] = 0;
                     consolidatedOrders[itemId] += order[itemId];
+                    
                 });
             });
 
@@ -361,7 +384,8 @@
                 const qty = consolidatedOrders[itemId];
                 const price = qty * item.price;
                 totalPrice += price;
-
+                totalItems = itemId;
+                
                 summaryHtml += `
                     <div class="summary-item">
                         <span>${item.name} × ${qty}</span>
@@ -371,11 +395,9 @@
             });
 
             if (Object.keys(consolidatedOrders).length > 0) {
-                fullSummaryWrapper.style.display = 'block';
                 fullSummaryDiv.innerHTML = summaryHtml;
-                fullTotalDiv.textContent = `Total: ৳${totalPrice}`;
+                fullTotalDiv.textContent = `Total Items: ${totalItems} | মোট: ৳${totalPrice}`;
             } else {
-                fullSummaryWrapper.style.display = 'none';
             }
         }
 

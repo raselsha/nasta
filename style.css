@@ -288,6 +288,13 @@
             width: 260px; }
         .user-list .user-btn { margin-left: 0.5em; }
         .user-label { font-weight: bold; margin-right: 0.5em; }
-        .summary-user { margin: 1px 0; font-size:15px; font-weight: bold;}
+        .summary-user {margin: 1px 0;
+  font-size: 15px;
+  font-weight: bold;
+  background: #ddd;
+  padding:2px 5px;
+  border-radius: 5px 5px 0 0;
+  display: flex;
+  justify-content: space-between;}
         .user-balance { margin: 2px 0; color: #007b5e; font-size: 14px; }
-        .balance-negative { color: #ff6b6b; }
+        .balance-negative { color: red; }
