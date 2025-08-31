@@ -8,11 +8,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
             position: relative;
         }
 
         .container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-content{
             max-width: 600px;
             background: #fff;
             backdrop-filter: blur(10px);
@@ -179,14 +183,6 @@
             border-color: #ff6b6b;
         }
 
-        .order-summary {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #ff6b6b;
-            height: 100%;
-        }
-
         .summary-item {
             display: flex;
             justify-content: space-between;
@@ -227,18 +223,61 @@
             border: 2px dashed #ff6b6b;
         }
         .mini-cart{
-            position: fixed;
+            display:flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #ff6b6b;
+            gap: 20px;
+            position: relative;
+            top: 0;
             right: 0;
-            top:50%;
-            transform: translateY(-50%);
             height: 100%;
+            width: 600px;
+            transform: translateX(100%);  /* hidden by default */
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        #toggleCartBtn{
+            position: absolute;
+            left: -20px;
+            top: 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 50px;
+            font-size: 1.5rem;
+            border-radius: 5px 0 0 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background 0.3s ease;
+        }
+        .mini-cart.active {
+            transform: translateX(0);   /* slide into view */
+        }
+
+        .mini-cart.inactive {
+            transform: translateX(100%); /* slide out */
+        }
+        .toggle-cart-btn{
+            position: absolute;
+            right: 0;
+            left: 0;
+        }
+        .order-summary {
+            height: 100%;
+            width: 320px;
+            padding: 20px;
+            
         }
         .summaryItems{
-            min-height:650px;
+            min-height:550px;
+            height:550px;
             overflow: auto;
         }
         .menuItems{
-            height: 800px;
+            height: 700px;
             overflow: auto;
         }
 

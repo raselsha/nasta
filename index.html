@@ -11,7 +11,6 @@
 </head>
 <body>
     <div class="container">
-        
         <form class="form-content" id="breakfastForm">
             <div class="menu-section">
                 <h3 class="section-title">Breakfast Menu</h3>
@@ -23,21 +22,25 @@
                 <div id="menuItems" class="menuItems"></div>
             </div>
         </form>
-    </div>
-    <div class="mini-cart">
-        <div class="order-summary" id="orderSummary" style="display: none;">
-            <h3 class="section-title">Order Summary</h3>
-            <div id="summaryItems" class="summaryItems"></div>
-            <div class="total-amount" id="totalAmount">Total Items: 0</div>
-            <button type="button" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button>
+        <!-- summery -->
+        <div class="mini-cart">
+            <div class="order-summary" id="orderSummary" >
+                <h3 class="section-title">Customer Order</h3>
+                <div id="summaryItems" class="summaryItems"></div>
+                <div class="total-amount" id="totalAmount">Total Items: 0</div>
+                <button type="button" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button>
+            </div>
+            <div class="order-summary" id="fullSummary">
+                <h3 class="section-title">All Orders Summary</h3>
+                <div id="fullSummaryItems" class="summaryItems"></div>
+                <div class="total-amount" id="fullTotalAmount">Total: ৳0</div>
+                <button type="button" class="submit-btn" onclick="downloadFullSummaryImage()">Download All Orders</button>
+            </div>
+            <button id="toggleCartBtn" class="toggle-cart-btn">❮</button>
         </div>
-        <div class="order-summary" id="fullSummary" style="display: none;">
-            <h3 class="section-title">All Orders Summary</h3>
-            <div id="fullSummaryItems" class="summaryItems"></div>
-            <div class="total-amount" id="fullTotalAmount">Total: ৳0</div>
-            <button type="button" class="submit-btn" onclick="downloadFullSummaryImage()">Download All Orders</button>
-        </div>
+        
     </div>
+    
 
 
 
@@ -57,7 +60,7 @@
             windowWidth: orderSummary.scrollWidth + 40,
             windowHeight: orderSummary.scrollHeight + 40,
             onclone: (clonedDoc) => {
-                const clonedSummary = clonedDoc.getElementById('summaryItems');
+                const clonedSummary = clonedDoc.getElementById('fullSummaryItems');
                 if (clonedSummary) {
                     clonedSummary.style.padding = "20px";
                     clonedSummary.style.boxSizing = "border-box";
@@ -292,17 +295,29 @@
                     summaryHtml += `<div class="user-balance${userBalance < 0 ? ' balance-negative' : ''}">Balance: ৳${userBalance}</div>`;
                 }
             });
+            const miniCart = document.querySelector('.mini-cart');
 
             if (hasSelectedItems) {
-                orderSummaryDiv.style.display = 'block';
+                miniCart.classList.add('active');
+                miniCart.classList.remove('inactive');
                 summaryDiv.innerHTML = summaryHtml;
                 totalAmountDiv.textContent = `Total Items: ${totalItems} | মোট: ৳${totalPrice}`;
             } else {
-                orderSummaryDiv.style.display = 'none';
+                miniCart.classList.remove('active');
+                miniCart.classList.add('inactive');
             }
+
             updateFullSummary();
 
         }
+
+        const miniCart = document.querySelector('.mini-cart');
+        const toggleBtn = document.getElementById('toggleCartBtn');
+
+        toggleBtn.addEventListener('click', () => {
+            miniCart.classList.toggle('active');
+            miniCart.classList.toggle('inactive');
+        });
 
         window.toggleQuantity = toggleQuantity;
         window.increaseQty = increaseQty;
