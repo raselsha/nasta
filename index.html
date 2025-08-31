@@ -31,11 +31,20 @@
             <div class="total-amount" id="totalAmount">Total Items: 0</div>
             <button type="button" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button>
         </div>
+        <div class="order-summary" id="fullSummary" style="display: none;">
+            <h3 class="section-title">All Orders Summary</h3>
+            <div id="fullSummaryItems" class="summaryItems"></div>
+            <div class="total-amount" id="fullTotalAmount">Total: ৳0</div>
+            <button type="button" class="submit-btn" onclick="downloadFullSummaryImage()">Download All Orders</button>
+        </div>
     </div>
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
-     function downloadSummaryImage() {
-        const orderSummary = document.getElementById('summaryItems');
+    function downloadSummaryImage() {
+        const orderSummary = document.getElementById('fullSummaryItems');
         const prevOverflow = orderSummary.style.overflow;
         const prevHeight   = orderSummary.style.height;
         orderSummary.style.overflow = "visible";
@@ -63,6 +72,16 @@
             link.click();
         });
     }
+    function downloadFullSummaryImage() {
+        const fullSummary = document.getElementById('fullSummaryItems');
+        html2canvas(fullSummary, { backgroundColor: '#fff' }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'all-orders-summary.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
     </script>
     <script>
         // --- User Management ---
@@ -281,6 +300,8 @@
             } else {
                 orderSummaryDiv.style.display = 'none';
             }
+            updateFullSummary();
+
         }
 
         window.toggleQuantity = toggleQuantity;
@@ -301,6 +322,48 @@
 
         // Load first user's order on page load
         loadUserOrder();
+        function updateFullSummary() {
+            const fullSummaryDiv = document.getElementById('fullSummaryItems');
+            const fullSummaryWrapper = document.getElementById('fullSummary');
+            const fullTotalDiv = document.getElementById('fullTotalAmount');
+
+            let consolidatedOrders = {}; // { itemId: totalQty }
+            let totalPrice = 0;
+
+            // Collect all orders across all users
+            users.forEach(user => {
+                const order = userOrders[user] || {};
+                Object.keys(order).forEach(itemId => {
+                    if (!consolidatedOrders[itemId]) consolidatedOrders[itemId] = 0;
+                    consolidatedOrders[itemId] += order[itemId];
+                });
+            });
+
+            // Build summary HTML
+            let summaryHtml = '';
+            Object.keys(consolidatedOrders).forEach(itemId => {
+                const item = menuItemsData.find(i => i.id == itemId);
+                const qty = consolidatedOrders[itemId];
+                const price = qty * item.price;
+                totalPrice += price;
+
+                summaryHtml += `
+                    <div class="summary-item">
+                        <span>${item.name} × ${qty}</span>
+                        <span>৳${price}</span>
+                    </div>
+                `;
+            });
+
+            if (Object.keys(consolidatedOrders).length > 0) {
+                fullSummaryWrapper.style.display = 'block';
+                fullSummaryDiv.innerHTML = summaryHtml;
+                fullTotalDiv.textContent = `Total: ৳${totalPrice}`;
+            } else {
+                fullSummaryWrapper.style.display = 'none';
+            }
+        }
+
     </script>
 </body>
 </html>
