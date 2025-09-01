@@ -279,6 +279,7 @@
         .menuItems{
             height: 700px;
             overflow: auto;
+            padding-top: 5px;
         }
 
         /* userlist */
