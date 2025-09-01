@@ -24,14 +24,14 @@
             <div class="order-summary" id="orderSummary" >
                 <h3 class="section-title">Customer Order</h3>
                 <div id="summaryItems" class="summaryItems"></div>
-                <!-- <div class="total-amount" id="totalAmount">Total Items: 0</div> -->
-                <!-- <button type="button" class="submit-btn" onclick="downloadSummaryImage()">Download Summary as Image</button> -->
+                <div class="total-amount" id="totalAmount">Total Items: 0</div>
+                <button type="button" class="submit-btn totalAmount" onclick="downloadSummaryImage()">Download Summary as Image</button>
             </div>
             <div class="order-summary" id="fullSummary">
                 <h3 class="section-title">All Orders Summary</h3>
                 <div id="fullSummaryItems" class="summaryItems"></div>
                 <div class="total-amount" id="fullTotalAmount">Total: ৳0</div>
-                <button type="button" class="submit-btn" onclick="downloadFullSummaryImage()">Download All Orders</button>
+                <button type="button" class="submit-btn fullTotalAmount" onclick="downloadFullSummaryImage()">Generate Orders</button>
             </div>
             <button id="toggleCartBtn" class="toggle-cart-btn">❮</button>
         </div>
