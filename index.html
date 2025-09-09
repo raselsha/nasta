@@ -44,7 +44,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
     function downloadSummaryImage() {
-        const orderSummary = document.getElementById('fullSummaryItems');
+        const orderSummary = document.getElementById('summaryItems');
         const prevOverflow = orderSummary.style.overflow;
         const prevHeight   = orderSummary.style.height;
         orderSummary.style.overflow = "visible";
@@ -57,7 +57,7 @@
             windowWidth: orderSummary.scrollWidth + 40,
             windowHeight: orderSummary.scrollHeight + 40,
             onclone: (clonedDoc) => {
-                const clonedSummary = clonedDoc.getElementById('fullSummaryItems');
+                const clonedSummary = clonedDoc.getElementById('summaryItems');
                 if (clonedSummary) {
                     clonedSummary.style.padding = "20px";
                     clonedSummary.style.boxSizing = "border-box";
@@ -67,7 +67,7 @@
             orderSummary.style.overflow = prevOverflow;
             orderSummary.style.height   = prevHeight;
             const link = document.createElement('a');
-            link.download = 'order-summary.png';
+            link.download = 'customer-order-summary.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
