@@ -177,7 +177,8 @@
             { id: 18, name: 'কাঁচা ডিম', price: 12 },
             { id: 19, name: 'সিঙ্গারা', price: 20 },
             { id: 20, name: 'সমুচা', price: 20 },
-            { id: 21, name: 'গিলা কলিজা', price: 40 }
+            { id: 21, name: 'গিলা কলিজা', price: 40 },
+            { id: 22, name: 'টক দই', price: 100 }
         ];
 
         function toggleCheckbox(id) {
@@ -196,12 +197,15 @@
             menuDiv.innerHTML = '';
             menuItemsData.forEach(item => {
                 menuDiv.innerHTML += `
-                <div class="menu-item">
+                <div class="menu-item" >
                     <div class="item-left" onclick="toggleCheckbox(${item.id})">
-                        <input type="checkbox" id="item${item.id}" onchange="toggleQuantity(${item.id})">
-                        <label for="item${item.id}" class="item-name">${item.name} </label>
+                        <span>
+                            <input type="checkbox" id="item${item.id}" onchange="toggleQuantity(${item.id})">
+                            <label for="item${item.id}" class="item-name">${item.name} </label>
+                        </span>
+                        <h2 class="item-price">৳${item.price}</h2>
                     </div>
-                    <h2 style="color:#ff6b6b;font-size:0.95em;">৳${item.price}</h2>
+                    
                     <div class="quantity-input" id="qty${item.id}">
                         <button type="button" class="qty-btn" onclick="decreaseQty(${item.id})">−</button>
                         <input type="number" id="input${item.id}" value="1" min="1" max="50" readonly>
